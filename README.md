@@ -90,3 +90,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Maintainers
 ShawnLee - [@shawnlee103](https://github.com/shawnlee103)
+
+
+## Repository detail
+
+This repository is a clone of [Original Repository](https://github.com/seiching/aicoachcrm), which I maintain. Since I am responsible for the maintenance of the original project, I have created this new repository to continue its development and manage future updates.
+
+All changes and updates will be reflected here, and this repository will serve as the primary source for any future contributions or improvements.
+
+For historical reference or to see the original project, please visit [Original Repository](https://github.com/seiching/aicoachcrm).
