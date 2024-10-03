@@ -57,7 +57,7 @@ configuration = Configuration(
 )
 
 user_calls = {}
-user_limit, liveguide, actoraction, sheet_log = util.get_google_sheet(key_file)
+user_limit, live_guide, actor_action, sheet_log = util.get_google_sheet(key_file)
 
 
 def track_calls(user_id):
@@ -115,12 +115,12 @@ def message_text(event):
     if event.message.text[0] == '/':
         twtimenow = util.get_taipeitime()
         twtimenow = twtimenow.strftime("%m/%d/%Y, %H:%M:%S")
-        userid = event.source.user_id
+        user_id = event.source.user_id
         userinput = event.message.text[1:]
-        if (not track_calls(userid)):
+        if (not track_calls(user_id)):
             msg_result = '您已超過今天使用額度，請明天再來'
             # username=line_bot_api.get_profile (event.source.user_id)
-            sheet_log.append_rows([[util.idhash(userid), twtimenow, userinput, msg_result]])
+            sheet_log.append_rows([[util.idhash(user_id), twtimenow, userinput, msg_result]])
             with ApiClient(configuration) as api_client:
                 line_bot_api = MessagingApi(api_client)
                 line_bot_api.reply_message_with_http_info(
@@ -131,12 +131,12 @@ def message_text(event):
                 )
             return
 
-        azure_openai_result = azure_openai(userid, userinput)
+        azure_openai_result = azure_openai(user_id, userinput)
         with ApiClient(configuration) as api_client:
             line_bot_api = MessagingApi(api_client)
             # username=line_bot_api.get_profile (event.source.user_id)
-            sheet_log.append_rows([[util.idhash(userid), twtimenow, userinput, azure_openai_result]])
-            util.add_user_msg(userid, {'role': 'user', 'content': userinput},
+            sheet_log.append_rows([[util.idhash(user_id), twtimenow, userinput, azure_openai_result]])
+            util.add_user_msg(user_id, {'role': 'user', 'content': userinput},
                               {'role': 'assistant', 'content': azure_openai_result}, user_conversations)
 
             line_bot_api.reply_message_with_http_info(
@@ -157,24 +157,27 @@ def message_text(event):
             )
 
 
-def azure_openai(userid, user_input):
+def load_user_history_chat(user_id, message_text):
+    chat_history = util.pop_user_msg(user_id, user_conversations)
+    for chat_item in chat_history:
+        message_text.append(chat_item[0])  ## user_input
+        message_text.append(chat_item[1])  ## system_output
+        # print('item', chat_item[0], chat_item[1])
+
+    return message_text
+
+
+def azure_openai(user_id, user_input):
     message_text = [
-        {"role": "system", "content": ""},
-        # {"role": "user", "content": user_input},
+        {"role": "system", "content": actor_action + '。' + live_guide},
     ]
-    message_text[0]["content"] += actoraction + '。' + liveguide
-    chat_history = util.pop_user_msg(userid, user_conversations)
+    message_text = load_user_history_chat(user_id, message_text)
+    message_text.append({"role": "user", "content": user_input})
+    # print(message_text)
 
-    newmessage = message_text.copy()
-    for chatitem in chat_history:
-        newmessage.append(chatitem[0])
-        newmessage.append(chatitem[1])
-        # print('item', chatitem[0], chatitem[1])
-
-    newmessage.append({"role": "user", "content": user_input})
     completion = client.chat.completions.create(
         model=config["model"]["modelname"],
-        messages=newmessage,
+        messages=message_text,
         max_tokens=2800,
         top_p=0.5,
         frequency_penalty=0,
