@@ -2,6 +2,8 @@
 
 This repository contains a Line chatbot application that leverages the OpenAI ChatGPT API to provide intelligent responses. The bot is designed to handle various user queries by integrating with multiple APIs and providing relevant responses.
 
+![我的圖片](images/LLM_Line_Chatbot.JPG)
+
 ## Table of Contents
 
 - [Installation](#installation)
@@ -17,8 +19,8 @@ This repository contains a Line chatbot application that leverages the OpenAI Ch
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/seiching/aicoachcrm.git
-    cd aicoachcrm
+    git clone https://github.com/shawnlee103/LLM-Line-Chatbot
+    cd LLM-Line-Chatbot
     ```
 
 2. Install the required dependencies:
@@ -64,7 +66,7 @@ This repository contains a Line chatbot application that leverages the OpenAI Ch
 3. Update your Line Developer Console with the ngrok URL to receive webhook events.
 
 
-5. Ensure you have a Google Drive with a worksheet named `LLMWorksheet`. The chatbot will read prompts from this worksheet to provide responses.
+4. Ensure you have a Google Drive with a worksheet named `LLMWorksheet`. The chatbot will read prompts from this worksheet to provide responses.
 
 
 ## File Structure
